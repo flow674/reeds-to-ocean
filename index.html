@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>从芦苇到大海 · 世界灿烂盛大</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --reeds-warm: #e8a94f;
+    --ink: #2b2419;
+    --sea-deep: #0d2a4a;
+    --sea-light: #cfe6f5;
+  }
+
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: #0a1626;
+    overflow-x: hidden;
+    color: #fff;
+  }
+
+  /* ============ 通用：全屏场景 ============ */
+  .scene {
+    position: relative;
+    height: 100vh;
+    height: 100svh;   /* 手机浏览器地址栏不会吃掉画面 */
+    overflow: hidden;
+  }
+  .scene .bg {
+    position: absolute;
+    inset: -6%;
+    background-size: cover;
+    background-position: center;
+    will-change: transform;
+  }
+
+  /* ============ 第一幕：芦苇飘荡 ============ */
+  #reeds .bg {
+    background-image: url("assets/reeds.jpg");
+    animation: reedsSway 9s ease-in-out infinite alternate;
+    transform-origin: 50% 100%;
+  }
+  @keyframes reedsSway {
+    0%   { transform: scale(1.06) rotate(-0.6deg) skewX(-0.4deg); }
+    100% { transform: scale(1.10) rotate(0.6deg)  skewX(0.4deg); }
+  }
+
+  /* 芦苇丛里的光尘 */
+  .dust {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,224,150,0.95), rgba(255,200,100,0));
+    animation: dustFloat linear infinite;
+    pointer-events: none;
+  }
+  @keyframes dustFloat {
+    0%   { transform: translate(0, 0) scale(1); opacity: 0; }
+    10%  { opacity: 0.9; }
+    90%  { opacity: 0.5; }
+    100% { transform: translate(6vw, -60vh) scale(0.4); opacity: 0; }
+  }
+
+  /* 第一幕文案 */
+  .caption {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 1.6s ease, transform 1.6s ease;
+    padding: 0 6vw;
+  }
+  .caption.show { opacity: 1; transform: translate(-50%, -52%); }
+  .caption h2 {
+    font-size: clamp(1.6rem, 4.2vw, 3rem);
+    font-weight: 600;
+    letter-spacing: 0.35em;
+    text-indent: 0.35em;
+    text-shadow: 0 2px 24px rgba(0,0,0,0.55);
+    margin-bottom: 1.2rem;
+  }
+  .caption p {
+    font-size: clamp(0.95rem, 1.6vw, 1.2rem);
+    line-height: 2.1;
+    letter-spacing: 0.18em;
+    color: rgba(255,248,235,0.92);
+    text-shadow: 0 1px 14px rgba(0,0,0,0.6);
+  }
+  #reeds .caption h2 { color: #ffe9c4; }
+
+  /* 向下滚动提示 */
+  .scroll-hint {
+    position: absolute;
+    bottom: 4.5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 6;
+    text-align: center;
+    font-size: 0.8rem;
+    letter-spacing: 0.4em;
+    text-indent: 0.4em;
+    color: rgba(255,255,255,0.75);
+    animation: hintPulse 2.4s ease-in-out infinite;
+  }
+  .scroll-hint::after {
+    content: "";
+    display: block;
+    width: 1px;
+    height: 42px;
+    margin: 10px auto 0;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.8), transparent);
+  }
+  @keyframes hintPulse {
+    0%, 100% { opacity: 0.45; transform: translate(-50%, 0); }
+    50%      { opacity: 1;    transform: translate(-50%, 6px); }
+  }
+
+  /* ============ 第二幕：过渡 · 小新奔跑 ============ */
+  #run {
+    background: linear-gradient(180deg,
+      #d99a45 0%,     /* 芦苇的暖橙余晖 */
+      #e8b96a 18%,
+      #f2d9a0 38%,    /* 破晓的亮 */
+      #bcd8ea 62%,    /* 天光渐蓝 */
+      #7fb2d9 82%,
+      #4a86bd 100%);  /* 接近海色 */
+  }
+  /* 过渡段的地面线，小新在其上奔跑 */
+  #run .ground {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 16vh;
+    background: linear-gradient(180deg, rgba(20,60,100,0) 0%, rgba(16,50,90,0.55) 100%);
+  }
+  #run .ground::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+  }
+
+  /* 小新：贴纸质感 + 奔跑弹跳 + 从左到右循环 */
+  .shinchan-track {
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 11vh;
+    height: 24vh;
+    z-index: 4;
+    pointer-events: none;
+  }
+  .shinchan {
+    position: absolute;
+    bottom: 0;
+    left: -18vw;
+    width: clamp(110px, 14vw, 190px);
+    animation:
+      runAcross 11s linear infinite,
+      runBounce 0.42s ease-in-out infinite;
+  }
+  .shinchan img {
+    width: 100%;
+    display: block;
+    border-radius: 18px;
+    filter: drop-shadow(0 10px 18px rgba(20,40,70,0.35));
+  }
+  @keyframes runAcross {
+    0%   { left: -20vw; }
+    100% { left: 108vw; }
+  }
+  @keyframes runBounce {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50%      { transform: translateY(-9%) rotate(2deg); }
+  }
+  /* 奔跑扬起的尘点 */
+  .kick {
+    position: absolute;
+    bottom: 4px;
+    left: 6%;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.55);
+    animation: kickFade 0.7s ease-out infinite;
+  }
+  .kick:nth-child(2) { animation-delay: 0.25s; }
+  @keyframes kickFade {
+    0%   { transform: translate(0,0) scale(1);    opacity: 0.7; }
+    100% { transform: translate(-46px,-26px) scale(0.2); opacity: 0; }
+  }
+
+  #run .caption h2 { color: #4a3a20; text-shadow: none; }
+  #run .caption p  { color: rgba(60,48,28,0.85); text-shadow: none; }
+
+  /* ============ 第三幕：波光粼粼 ============ */
+  #ocean .bg {
+    background-image: url("assets/ocean.jpg");
+    animation: seaBreath 12s ease-in-out infinite alternate;
+  }
+  @keyframes seaBreath {
+    0%   { transform: scale(1.05) translateY(0); }
+    100% { transform: scale(1.09) translateY(-1.2%); }
+  }
+
+  /* 水面浮动：两层流动的波光 */
+  .wave-layer {
+    position: absolute;
+    left: -50%;
+    width: 200%;
+    height: 46%;
+    bottom: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    mix-blend-mode: screen;
+  }
+  .wave-layer svg { width: 100%; height: 100%; }
+  .wave-a { animation: waveDrift 14s linear infinite; }
+  .wave-b { animation: waveDrift 22s linear infinite reverse; opacity: 0.35; }
+  @keyframes waveDrift {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-25%); }
+  }
+
+  /* 海面碎金光斑 */
+  .glints span {
+    position: absolute;
+    bottom: 4%  ;
+    width: 34px; height: 5px;
+    border-radius: 50%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.85), transparent);
+    animation: glintTwinkle ease-in-out infinite;
+    opacity: 0;
+  }
+  @keyframes glintTwinkle {
+    0%, 100% { opacity: 0; transform: scaleX(0.4); }
+    50%      { opacity: 0.9; transform: scaleX(1.15); }
+  }
+
+  /* 游艇：在海面缓缓航行 */
+  .yacht {
+    position: absolute;
+    z-index: 3;
+    pointer-events: none;
+  }
+  .yacht svg { display: block; width: 100%; height: auto; }
+  .yacht .hull { animation: hullBob 3.4s ease-in-out infinite; transform-origin: 50% 60%; }
+  @keyframes hullBob {
+    0%, 100% { transform: translateY(0) rotate(-1.2deg); }
+    50%      { transform: translateY(-6%) rotate(1.4deg); }
+  }
+  .yacht-1 {
+    width: clamp(80px, 7.5vw, 120px);
+    top: 66%;
+    animation: sail1 55s linear infinite;
+    opacity: 0.9;
+  }
+  @keyframes sail1 {
+    0%   { left: -12vw; }
+    100% { left: 106vw; }
+  }
+  .yacht-2 {
+    width: clamp(38px, 3.4vw, 56px);
+    top: 60%;
+    animation: sail2 80s linear infinite reverse;
+    opacity: 0.55;
+  }
+  @keyframes sail2 {
+    0%   { left: 104vw; }
+    100% { left: -10vw; }
+  }
+  .yacht-3 { display: none; }
+  @keyframes sail3 {
+    0%   { left: -8vw; }
+    100% { left: 104vw; }
+  }
+
+  #ocean .caption { top: 40%; width: 100%; }
+  #ocean .caption h2 {
+    color: #eaf6ff;
+    white-space: nowrap;
+    font-size: clamp(1.4rem, 3.2vw, 2.5rem);
+  }
+  #ocean .caption p  { color: rgba(240,250,255,0.95); text-shadow: 0 1px 10px rgba(10,40,70,0.8); }
+  #ocean .caption .sign { text-shadow: 0 1px 8px rgba(10,40,70,0.85); color: rgba(255,255,255,0.85); }
+  #ocean .caption .finale {
+    margin-top: 2.2rem;
+    font-size: clamp(1.05rem, 2vw, 1.5rem);
+    letter-spacing: 0.3em;
+    text-indent: 0.3em;
+    color: #ffffff;
+    font-weight: 600;
+  }
+  #ocean .caption .sign {
+    margin-top: 2.4rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.25em;
+    color: rgba(255,255,255,0.65);
+  }
+
+  /* ============ 音乐控制 ============ */
+  .music-btn {
+    position: fixed;
+    top: 22px;
+    right: 22px;
+    z-index: 99;
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.55);
+    background: rgba(10,22,38,0.45);
+    backdrop-filter: blur(6px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease, background 0.3s ease;
+  }
+  .music-btn:hover { transform: scale(1.1); background: rgba(10,22,38,0.7); }
+  .music-btn svg { width: 20px; height: 20px; }
+  .music-btn .note { animation: noteSpin 3s linear infinite; animation-play-state: paused; }
+  .music-btn.playing .note { animation-play-state: running; }
+  @keyframes noteSpin {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .music-btn .slash { display: none; }
+  .music-btn:not(.playing) .slash { display: block; }
+
+  /* ============ 开场遮罩（解锁音频） ============ */
+  #gate {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: linear-gradient(160deg, #2b2013 0%, #4a3316 45%, #10233d 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2.2rem;
+    cursor: pointer;
+    transition: opacity 1.2s ease;
+  }
+  #gate.hide { opacity: 0; pointer-events: none; }
+  #gate .gate-title {
+    font-size: clamp(1.4rem, 3.4vw, 2.3rem);
+    letter-spacing: 0.5em;
+    text-indent: 0.5em;
+    color: #f5e6c8;
+    font-weight: 600;
+  }
+  #gate .gate-sub {
+    font-size: 0.9rem;
+    letter-spacing: 0.3em;
+    color: rgba(245,230,200,0.6);
+  }
+  #gate .gate-btn {
+    margin-top: 1rem;
+    padding: 0.9rem 3.2rem;
+    border: 1px solid rgba(245,230,200,0.7);
+    border-radius: 999px;
+    font-size: 1rem;
+    letter-spacing: 0.4em;
+    text-indent: 0.4em;
+    color: #f5e6c8;
+    transition: all 0.4s ease;
+    animation: gateGlow 2.6s ease-in-out infinite;
+  }
+  @keyframes gateGlow {
+    0%, 100% { box-shadow: 0 0 0 rgba(245,230,200,0); }
+    50%      { box-shadow: 0 0 26px rgba(245,230,200,0.35); }
+  }
+  #gate:hover .gate-btn { background: rgba(245,230,200,0.12); }
+
+  /* ============ 手机端适配 ============ */
+  @media (max-width: 640px) {
+    .caption { padding: 0 9vw; }
+    .caption h2 {
+      letter-spacing: 0.22em;
+      text-indent: 0.22em;
+      font-size: clamp(1.25rem, 6.4vw, 1.7rem);
+      margin-bottom: 0.9rem;
+    }
+    .caption p {
+      letter-spacing: 0.1em;
+      font-size: clamp(0.85rem, 3.7vw, 1rem);
+      line-height: 1.95;
+    }
+    #ocean .caption h2 { white-space: normal; font-size: clamp(1.2rem, 6vw, 1.6rem); }
+    #ocean .caption .finale {
+      font-size: clamp(0.95rem, 4.6vw, 1.25rem);
+      letter-spacing: 0.18em;
+      text-indent: 0.18em;
+      margin-top: 1.4rem;
+    }
+    #ocean .caption { top: 38%; }
+    .shinchan { width: 26vw; }
+    .shinchan-track { bottom: 14vh; height: 22vh; }
+    .scroll-hint { font-size: 0.7rem; letter-spacing: 0.3em; text-indent: 0.3em; }
+    .dust { display: none; }       /* 手机上省性能 */
+    #gate .gate-title { letter-spacing: 0.3em; text-indent: 0.3em; }
+    .music-btn { top: 14px; right: 14px; width: 40px; height: 40px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 开场遮罩：浏览器要求用户交互后才能播放声音 -->
+<div id="gate">
+  <div class="gate-title">从芦苇到大海</div>
+  <div class="gate-sub">世界灿烂盛大，值得我们去探索</div>
+  <div class="gate-btn">开启旅程 · ♪ 晴天</div>
+</div>
+
+<!-- 音乐按钮 -->
+<button class="music-btn" id="musicBtn" title="播放 / 暂停 晴天">
+  <svg class="note" viewBox="0 0 24 24" fill="none" stroke="#f5e6c8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 18V5l12-2v13"/>
+    <circle cx="6" cy="18" r="3"/>
+    <circle cx="18" cy="16" r="3"/>
+  </svg>
+  <svg class="slash" viewBox="0 0 24 24" fill="none" stroke="#f5e6c8" stroke-width="2" stroke-linecap="round" style="position:absolute">
+    <line x1="4" y1="20" x2="20" y2="4"/>
+  </svg>
+</button>
+<audio id="bgm" loop preload="auto">
+  <source src="assets/qingtian.mp3" type="audio/mpeg">
+  <source src="assets/qingtian.mp4" type="audio/mp4">
+</audio>
+
+<!-- ============ 第一幕：芦苇飘荡 ============ -->
+<section class="scene" id="reeds">
+  <div class="bg"></div>
+  <div class="caption">
+    <h2>灰暗的芦苇深处</h2>
+    <p>我们曾在灰暗的芦苇角落里默默生存<br>
+       风一层层压下来，我们低下头，再挺起来<br>
+       也许总想抓住那一点点微弱的阳光<br>
+       沉稳地扎根，然后，不断地向前</p>
+  </div>
+  <div class="scroll-hint">向下滚动 · 继续前行</div>
+</section>
+
+<!-- ============ 第二幕：奔跑的小新 ============ -->
+<section class="scene" id="run">
+  <div class="caption">
+    <h2>后来，风起了</h2>
+    <p>我们不再等待阳光落下来<br>
+       而是开始奔跑，穿过芦苇，迎着风，嬉戏着，向前</p>
+  </div>
+  <div class="shinchan-track">
+    <div class="shinchan">
+      <div class="kick"></div>
+      <div class="kick"></div>
+      <img src="assets/shinchan.jpg" alt="奔跑的蜡笔小新">
+    </div>
+  </div>
+  <div class="ground"></div>
+</section>
+
+<!-- ============ 第三幕：波光粼粼 ============ -->
+<section class="scene" id="ocean">
+  <div class="bg"></div>
+
+  <div class="wave-layer wave-a">
+    <svg viewBox="0 0 1200 200" preserveAspectRatio="none">
+      <path d="M0 110 Q 75 70 150 110 T 300 110 T 450 110 T 600 110 T 750 110 T 900 110 T 1050 110 T 1200 110 V200 H0 Z"
+            fill="rgba(190,225,250,0.35)"/>
+      <path d="M0 150 Q 100 120 200 150 T 400 150 T 600 150 T 800 150 T 1000 150 T 1200 150 V200 H0 Z"
+            fill="rgba(220,240,255,0.28)"/>
+    </svg>
+  </div>
+  <div class="wave-layer wave-b">
+    <svg viewBox="0 0 1200 200" preserveAspectRatio="none">
+      <path d="M0 130 Q 90 95 180 130 T 360 130 T 540 130 T 720 130 T 900 130 T 1080 130 T 1260 130 V200 H0 Z"
+            fill="rgba(160,210,245,0.30)"/>
+    </svg>
+  </div>
+
+  <div class="glints" id="glints"></div>
+
+  <!-- 游艇（白帆小艇，SVG 绘制） -->
+  <div class="yacht yacht-1">
+    <svg viewBox="0 0 160 52">
+      <g class="hull">
+        <path d="M6 34 Q 10 46 30 46 L 134 46 Q 154 43 158 34 Q 120 38 60 38 Q 30 38 6 34 Z" fill="#f7fafc"/>
+        <path d="M30 34 Q 34 24 52 23 L 108 23 Q 124 25 132 34 Z" fill="#ffffff"/>
+        <path d="M50 23 Q 53 16 64 15 L 92 15 Q 102 16 106 23 Z" fill="#e6f0f8"/>
+        <path d="M64 15 Q 66 10 72 9 L 84 9 Q 89 10 91 15 Z" fill="#d8e8f3"/>
+      </g>
+    </svg>
+  </div>
+  <div class="yacht yacht-2">
+    <svg viewBox="0 0 160 52">
+      <g class="hull">
+        <path d="M6 34 Q 10 46 30 46 L 134 46 Q 154 43 158 34 Q 120 38 60 38 Q 30 38 6 34 Z" fill="#f2f7fb"/>
+        <path d="M30 34 Q 34 24 52 23 L 108 23 Q 124 25 132 34 Z" fill="#ffffff"/>
+      </g>
+    </svg>
+  </div>
+  <div class="yacht yacht-3">
+    <svg viewBox="0 0 120 60">
+      <g class="hull">
+        <path d="M8 40 Q 10 52 26 52 L 96 52 Q 112 50 116 40 Z" fill="#eef4f9"/>
+        <rect x="34" y="28" width="46" height="12" rx="3" fill="#ffffff"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="caption">
+    <h2>一片汪洋，清澈的大海</h2>
+    <p>时间流动，阻碍散去，我们终于看见那片汪洋向自己涌来<br>
+       各式各样的船帆在浩瀚中往来，天光落满海面<br>
+       这是雨过天晴的破晓，是一个更为广阔的世界</p>
+    <div class="finale">世界灿烂盛大，值得我们去探索</div>
+    <div class="sign">愿我们都能带着小新式的乐观，一直向前奔跑</div>
+  </div>
+</section>
+
+<script>
+  // ---- 开场遮罩：点击后解锁音频并进入页面 ----
+  const gate = document.getElementById('gate');
+  const bgm = document.getElementById('bgm');
+  const musicBtn = document.getElementById('musicBtn');
+
+  function startJourney() {
+    bgm.play().then(() => musicBtn.classList.add('playing')).catch(() => {});
+    gate.classList.add('hide');
+    setTimeout(() => gate.remove(), 1300);
+  }
+  gate.addEventListener('click', startJourney);
+
+  // ---- 音乐按钮 ----
+  musicBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (bgm.paused) {
+      bgm.play().then(() => musicBtn.classList.add('playing')).catch(() => {});
+    } else {
+      bgm.pause();
+      musicBtn.classList.remove('playing');
+    }
+  });
+
+  // ---- 文案随滚动淡入 ----
+  const captions = document.querySelectorAll('.caption');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) en.target.classList.add('show');
+      else en.target.classList.remove('show');
+    });
+  }, { threshold: 0.35 });
+  captions.forEach(c => io.observe(c));
+
+  // ---- 芦苇丛里的光尘 ----
+  const reeds = document.getElementById('reeds');
+  for (let i = 0; i < 26; i++) {
+    const d = document.createElement('div');
+    d.className = 'dust';
+    const size = 3 + Math.random() * 7;
+    d.style.width = size + 'px';
+    d.style.height = size + 'px';
+    d.style.left = Math.random() * 100 + '%';
+    d.style.top = (35 + Math.random() * 55) + '%';
+    d.style.animationDuration = (7 + Math.random() * 9) + 's';
+    d.style.animationDelay = (Math.random() * 10) + 's';
+    reeds.appendChild(d);
+  }
+
+  // ---- 海面碎金光斑 ----
+  const glints = document.getElementById('glints');
+  for (let i = 0; i < 22; i++) {
+    const s = document.createElement('span');
+    s.style.left = Math.random() * 96 + '%';
+    s.style.bottom = (2 + Math.random() * 30) + '%';
+    const w = 16 + Math.random() * 36;
+    s.style.width = w + 'px';
+    s.style.animationDuration = (2.4 + Math.random() * 3.4) + 's';
+    s.style.animationDelay = (Math.random() * 5) + 's';
+    glints.appendChild(s);
+  }
+</script>
+</body>
+</html>
